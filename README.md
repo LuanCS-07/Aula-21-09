@@ -115,3 +115,20 @@ Abra o arquivo `.github/workflows/publicar-site.yml` (é a "receita" do robô) e
 | Enviei o arquivo e o site não mudou | Espere 1 minuto e atualize com `Ctrl + F5`. Confira se está tudo ✅ na aba Actions. |
 | O arquivo enviado se chama `index (1).html` | Ele precisa se chamar exatamente `index.html`. Use sempre os arquivos das pastas extraídas do zip. |
 | Criei o repositório como **Private** | Settings → General → lá embaixo **Change visibility** → **Public**. |
+
+
+
+
+
+
+
+
+1. Issue e commit: A Issue identifica a tarefa e o commit registra a solução, facilitando o acompanhamento pela equipe terceirizada.
+
+2. Teste do freio: Uma regra automatizada protegeu o site, não uma conversa.
+
+3. Máquina do robô: Rodou na máquina configurada. As três regras podem funcionar localmente, sem nuvem.
+
+4. Ordem dos blocos: A linha de dependência faz o bloco 2 esperar o bloco 1, garantindo a ordem das 10 partes.
+
+5. Run workflow: O quadro cinza atualizou o resultado da execução, mas o código permaneceu igual. Uma empresa não precisa publicar diariamente, apenas quando houver mudanças relevantes.
