@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>## versao 5 -publicada em 19/10</title>
+  <title>Demo DevOps - Lembrete de Água</title>
   <style>
     body {
       margin: 0;
@@ -14,6 +14,7 @@
       background: #6e6e73;
       padding: 1rem;
     }
+
     .cartao {
       background: #fff;
       border-radius: 20px;
@@ -23,9 +24,16 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
       text-align: center;
       color: #1d1d1f;
+      box-sizing: border-box;
     }
+
     .emoji { font-size: 4rem; }
-    h1 { margin: .5rem 0; color: #6e6e73; }
+
+    h1 {
+      margin: .5rem 0;
+      color: #6e6e73;
+    }
+
     .versao {
       margin-top: 1.5rem;
       padding: 1rem;
@@ -34,6 +42,7 @@
       text-align: left;
       line-height: 1.8;
     }
+
     .botao {
       border: 0;
       border-radius: 10px;
@@ -44,10 +53,112 @@
       font-weight: 700;
       cursor: pointer;
     }
+
     .botao:hover { background: #3a3a3c; }
-    .status { min-height: 1.5rem; color: #6e6e73; }
-    code { background: #e5e5ea; padding: 2px 6px; border-radius: 6px; }
-    footer { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e5ea; color: #6e6e73; font-size: .85rem; }
+
+    .status {
+      min-height: 1.5rem;
+      color: #6e6e73;
+    }
+
+    code {
+      background: #e5e5ea;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e5ea;
+      color: #6e6e73;
+      font-size: .85rem;
+    }
+
+    /* Fundo escuro do pop-up */
+    .modal-fundo {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .modal-fundo.visivel {
+      display: flex;
+    }
+
+    /* Caixa do lembrete */
+    .modal {
+      background: #fff;
+      width: 100%;
+      max-width: 360px;
+      padding: 2rem;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+      animation: aparecer .3s ease;
+      box-sizing: border-box;
+    }
+
+    .modal-emoji {
+      font-size: 4rem;
+      margin-bottom: .5rem;
+    }
+
+    .modal h2 {
+      color: #1687d9;
+      margin: .5rem 0;
+    }
+
+    .modal p {
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .botao-agua {
+      background: #1687d9;
+      margin-top: .5rem;
+      width: 100%;
+    }
+
+    .botao-agua:hover {
+      background: #086bb2;
+    }
+
+    .botao-fechar {
+      background: #e5e5ea;
+      color: #333;
+      margin-top: .5rem;
+      width: 100%;
+    }
+
+    .botao-fechar:hover {
+      background: #d1d1d6;
+    }
+
+    @keyframes aparecer {
+      from {
+        opacity: 0;
+        transform: translateY(15px) scale(.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .cartao { padding: 1.5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .modal { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -56,14 +167,20 @@
     <h1>Demo DevOps</h1>
     <p>Uma pequena mudança feita ao vivo no Codespaces.</p>
 
-    <button class="botao" id="publicar" type="button">🚀 Simular nova publicação</button>
-    <p class="status" id="status" aria-live="polite">Aguardando o primeiro teste...</p>
+    <button class="botao" id="publicar" type="button">
+      🚀 Simular nova publicação
+    </button>
+
+    <p class="status" id="status" aria-live="polite">
+      Aguardando o primeiro teste...
+    </p>
 
     <div class="versao">
       🤖 <strong>Publicado pelo robô em:</strong> 28/09/2026<br>
       🔖 <strong>Commit:</strong> <code id="commit">__COMMIT__</code><br>
       👤 <strong>Enviado por:</strong> Luan Conrado<br>
-      🔁 <strong>Execuções nesta página:</strong> <span id="contador">0</span>
+      🔁 <strong>Execuções nesta página:</strong>
+      <span id="contador">0</span>
     </div>
 
     <footer>
@@ -71,18 +188,95 @@
       Luan Conrado da Silva
     </footer>
   </main>
+
+  <!-- Pop-up de lembrete de hidratação -->
+  <div
+    class="modal-fundo"
+    id="modalAgua"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tituloAgua"
+    aria-describedby="textoAgua"
+  >
+    <div class="modal">
+      <div class="modal-emoji">💧🥤</div>
+
+      <h2 id="tituloAgua">Deploy realizado com sucesso!</h2>
+
+      <p id="textoAgua">
+        Tudo certo com a publicação! 🎉<br>
+        Que tal fazer uma pausa e beber um copo de água?
+        Seu corpo agradece!
+      </p>
+
+      <button class="botao botao-agua" id="bebiAgua" type="button">
+        💙 Já bebi água!
+      </button>
+
+      <button class="botao botao-fechar" id="fecharModal" type="button">
+        Fechar
+      </button>
+    </div>
+  </div>
+
   <script>
     const botao = document.querySelector('#publicar');
     const status = document.querySelector('#status');
     const contador = document.querySelector('#contador');
     const commit = document.querySelector('#commit');
+
+    const modalAgua = document.querySelector('#modalAgua');
+    const bebiAgua = document.querySelector('#bebiAgua');
+    const fecharModal = document.querySelector('#fecharModal');
+
     let execucoes = 0;
+
+    function abrirLembreteAgua() {
+      modalAgua.classList.add('visivel');
+      bebiAgua.focus();
+    }
+
+    function fecharLembreteAgua() {
+      modalAgua.classList.remove('visivel');
+      botao.focus();
+    }
 
     botao.addEventListener('click', () => {
       execucoes += 1;
       contador.textContent = execucoes;
-      commit.textContent = `demo-${String(execucoes).padStart(2, '0')}`;
-      status.textContent = '✅ Verificação aprovada. Publicação concluída!';
+      commit.textContent =
+        `demo-${String(execucoes).padStart(2, '0')}`;
+
+      status.textContent =
+        '✅ Verificação aprovada. Publicação concluída!';
+
+      // Mostra o lembrete após a simulação bem-sucedida.
+      abrirLembreteAgua();
+    });
+
+    bebiAgua.addEventListener('click', () => {
+      fecharLembreteAgua();
+      status.textContent =
+        '💧 Ótimo! Continue cuidando de você.';
+    });
+
+    fecharModal.addEventListener('click', fecharLembreteAgua);
+
+    // Permite fechar o pop-up clicando fora dele.
+    modalAgua.addEventListener('click', (evento) => {
+      if (evento.target === modalAgua) {
+        fecharLembreteAgua();
+      }
+    });
+
+    // Permite fechar o pop-up usando a tecla Escape.
+    document.addEventListener('keydown', (evento) => {
+      if (
+        evento.key === 'Escape' &&
+        modalAgua.classList.contains('visivel')
+      ) {
+        fecharLembreteAgua();
+      }
     });
   </script>
 </body>
