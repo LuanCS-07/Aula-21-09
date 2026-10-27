@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Demo DevOps - Lembrete de Água</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -13,6 +19,7 @@
       font-family: system-ui, "Segoe UI", Roboto, sans-serif;
       background: #6e6e73;
       padding: 1rem;
+      overflow-x: hidden;
     }
 
     .cartao {
@@ -24,10 +31,13 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
       text-align: center;
       color: #1d1d1f;
-      box-sizing: border-box;
+      position: relative;
+      z-index: 1;
     }
 
-    .emoji { font-size: 4rem; }
+    .emoji {
+      font-size: 4rem;
+    }
 
     h1 {
       margin: .5rem 0;
@@ -41,6 +51,7 @@
       background: #f2f2f7;
       text-align: left;
       line-height: 1.8;
+      overflow-wrap: anywhere;
     }
 
     .botao {
@@ -52,9 +63,18 @@
       font: inherit;
       font-weight: 700;
       cursor: pointer;
+      transition: background .2s, transform .2s;
     }
 
-    .botao:hover { background: #3a3a3c; }
+    .botao:hover {
+      background: #3a3a3c;
+      transform: translateY(-2px);
+    }
+
+    .botao:focus-visible {
+      outline: 3px solid #38bdf8;
+      outline-offset: 3px;
+    }
 
     .status {
       min-height: 1.5rem;
@@ -85,7 +105,6 @@
       align-items: center;
       justify-content: center;
       padding: 1rem;
-      box-sizing: border-box;
     }
 
     .modal-fundo.visivel {
@@ -96,13 +115,12 @@
     .modal {
       background: #fff;
       width: 100%;
-      max-width: 360px;
+      max-width: 370px;
       padding: 2rem;
       border-radius: 20px;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
       animation: aparecer .3s ease;
-      box-sizing: border-box;
     }
 
     .modal-emoji {
@@ -152,20 +170,76 @@
       }
     }
 
+    /* Gotas de chuva */
+    .gota-chuva {
+      position: fixed;
+      top: -40px;
+      z-index: 2000;
+      pointer-events: none;
+      user-select: none;
+      color: #38bdf8;
+      font-size: 24px;
+      line-height: 1;
+      animation: cair-agua linear forwards;
+      will-change: transform, opacity;
+    }
+
+    @keyframes cair-agua {
+      0% {
+        transform: translateY(-30px) rotate(0deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: .8;
+      }
+
+      100% {
+        transform: translateY(110vh) rotate(180deg);
+        opacity: 0;
+      }
+    }
+
     @media (max-width: 480px) {
-      .cartao { padding: 1.5rem; }
+      .cartao {
+        padding: 1.5rem;
+      }
+
+      .modal {
+        padding: 1.5rem;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .modal { animation: none; }
+      .modal {
+        animation: none;
+      }
+
+      .botao {
+        transition: none;
+      }
+
+      .gota-chuva {
+        animation-duration: 1s !important;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <main class="cartao">
     <div class="emoji">🌱</div>
+
     <h1>Demo DevOps</h1>
-    <p>Uma pequena mudança feita ao vivo no Codespaces.</p>
+
+    <p>
+      Uma pequena mudança feita ao vivo no Codespaces.
+    </p>
 
     <button class="botao" id="publicar" type="button">
       🚀 Simular nova publicação
@@ -177,8 +251,12 @@
 
     <div class="versao">
       🤖 <strong>Publicado pelo robô em:</strong> 28/09/2026<br>
-      🔖 <strong>Commit:</strong> <code id="commit">__COMMIT__</code><br>
+
+      🔖 <strong>Commit:</strong>
+      <code id="commit">__COMMIT__</code><br>
+
       👤 <strong>Enviado por:</strong> Luan Conrado<br>
+
       🔁 <strong>Execuções nesta página:</strong>
       <span id="contador">0</span>
     </div>
@@ -189,7 +267,7 @@
     </footer>
   </main>
 
-  <!-- Pop-up de lembrete de hidratação -->
+  <!-- Pop-up de lembrete de água -->
   <div
     class="modal-fundo"
     id="modalAgua"
@@ -199,9 +277,12 @@
     aria-describedby="textoAgua"
   >
     <div class="modal">
+
       <div class="modal-emoji">💧🥤</div>
 
-      <h2 id="tituloAgua">Deploy realizado com sucesso!</h2>
+      <h2 id="tituloAgua">
+        Deploy realizado com sucesso!
+      </h2>
 
       <p id="textoAgua">
         Tudo certo com a publicação! 🎉<br>
@@ -209,13 +290,22 @@
         Seu corpo agradece!
       </p>
 
-      <button class="botao botao-agua" id="bebiAgua" type="button">
+      <button
+        class="botao botao-agua"
+        id="bebiAgua"
+        type="button"
+      >
         💙 Já bebi água!
       </button>
 
-      <button class="botao botao-fechar" id="fecharModal" type="button">
+      <button
+        class="botao botao-fechar"
+        id="fecharModal"
+        type="button"
+      >
         Fechar
       </button>
+
     </div>
   </div>
 
@@ -231,45 +321,91 @@
 
     let execucoes = 0;
 
+    // Abre o lembrete de hidratação
     function abrirLembreteAgua() {
       modalAgua.classList.add('visivel');
       bebiAgua.focus();
     }
 
+    // Fecha o lembrete de hidratação
     function fecharLembreteAgua() {
       modalAgua.classList.remove('visivel');
       botao.focus();
     }
 
+    // Simula uma nova publicação
     botao.addEventListener('click', () => {
       execucoes += 1;
+
       contador.textContent = execucoes;
+
       commit.textContent =
         `demo-${String(execucoes).padStart(2, '0')}`;
 
       status.textContent =
         '✅ Verificação aprovada. Publicação concluída!';
 
-      // Mostra o lembrete após a simulação bem-sucedida.
+      // Após o sucesso, mostra o lembrete
       abrirLembreteAgua();
     });
 
+    // Cria a chuva quando o usuário confirma que bebeu água
+    function iniciarChuva() {
+      const quantidadeGotas = 70;
+
+      for (let i = 0; i < quantidadeGotas; i++) {
+        const gota = document.createElement('div');
+
+        gota.className = 'gota-chuva';
+        gota.textContent = '💧';
+
+        // Posição horizontal aleatória
+        gota.style.left = Math.random() * 100 + 'vw';
+
+        // Velocidade variada
+        gota.style.animationDuration =
+          (1.5 + Math.random() * 2.5) + 's';
+
+        // Faz as gotas começarem em momentos diferentes
+        gota.style.animationDelay =
+          (Math.random() * 1.5) + 's';
+
+        // Tamanhos variados
+        gota.style.fontSize =
+          (14 + Math.random() * 20) + 'px';
+
+        document.body.appendChild(gota);
+
+        // Remove a gota depois da animação
+        gota.addEventListener('animationend', () => {
+          gota.remove();
+        }, { once: true });
+      }
+    }
+
+    // Botão "Já bebi água!"
     bebiAgua.addEventListener('click', () => {
       fecharLembreteAgua();
+
       status.textContent =
-        '💧 Ótimo! Continue cuidando de você.';
+        '💧 Ótimo! Continue cuidando de você. Está chovendo água!';
+
+      iniciarChuva();
     });
 
-    fecharModal.addEventListener('click', fecharLembreteAgua);
+    // Botão para fechar o pop-up sem iniciar a chuva
+    fecharModal.addEventListener('click', () => {
+      fecharLembreteAgua();
+    });
 
-    // Permite fechar o pop-up clicando fora dele.
+    // Fecha o pop-up ao clicar fora da caixa
     modalAgua.addEventListener('click', (evento) => {
       if (evento.target === modalAgua) {
         fecharLembreteAgua();
       }
     });
 
-    // Permite fechar o pop-up usando a tecla Escape.
+    // Fecha o pop-up com a tecla Escape
     document.addEventListener('keydown', (evento) => {
       if (
         evento.key === 'Escape' &&
@@ -279,5 +415,6 @@
       }
     });
   </script>
+
 </body>
 </html>
