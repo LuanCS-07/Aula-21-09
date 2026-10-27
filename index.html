@@ -95,7 +95,7 @@
       font-size: .85rem;
     }
 
-    /* Fundo escuro do pop-up */
+    /* Fundo do pop-up */
     .modal-fundo {
       display: none;
       position: fixed;
@@ -111,7 +111,6 @@
       display: flex;
     }
 
-    /* Caixa do lembrete */
     .modal {
       background: #fff;
       width: 100%;
@@ -170,37 +169,37 @@
       }
     }
 
-    /* Gotas de chuva */
-    .gota-chuva {
+    /* Camada de chuva por cima de toda a página */
+    #chuva-agua {
       position: fixed;
-      top: -40px;
-      z-index: 2000;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       pointer-events: none;
-      user-select: none;
-      color: #38bdf8;
-      font-size: 24px;
+      z-index: 99999;
+    }
+
+    .gota-chuva {
+      position: absolute;
+      top: -60px;
       line-height: 1;
-      animation: cair-agua linear forwards;
+      user-select: none;
+      animation: chuva-cair linear forwards;
       will-change: transform, opacity;
     }
 
-    @keyframes cair-agua {
+    @keyframes chuva-cair {
       0% {
-        transform: translateY(-30px) rotate(0deg);
+        transform: translateY(0) rotate(0deg);
         opacity: 0;
       }
-
       10% {
         opacity: 1;
       }
-
-      90% {
-        opacity: .8;
-      }
-
       100% {
-        transform: translateY(110vh) rotate(180deg);
-        opacity: 0;
+        transform: translateY(120vh) rotate(360deg);
+        opacity: .25;
       }
     }
 
@@ -222,10 +221,6 @@
       .botao {
         transition: none;
       }
-
-      .gota-chuva {
-        animation-duration: 1s !important;
-      }
     }
   </style>
 </head>
@@ -237,9 +232,7 @@
 
     <h1>Demo DevOps</h1>
 
-    <p>
-      Uma pequena mudança feita ao vivo no Codespaces.
-    </p>
+    <p>Uma pequena mudança feita ao vivo no Codespaces.</p>
 
     <button class="botao" id="publicar" type="button">
       🚀 Simular nova publicação
@@ -251,12 +244,9 @@
 
     <div class="versao">
       🤖 <strong>Publicado pelo robô em:</strong> 28/09/2026<br>
-
       🔖 <strong>Commit:</strong>
       <code id="commit">__COMMIT__</code><br>
-
       👤 <strong>Enviado por:</strong> Luan Conrado<br>
-
       🔁 <strong>Execuções nesta página:</strong>
       <span id="contador">0</span>
     </div>
@@ -267,7 +257,7 @@
     </footer>
   </main>
 
-  <!-- Pop-up de lembrete de água -->
+  <!-- Pop-up de hidratação -->
   <div
     class="modal-fundo"
     id="modalAgua"
@@ -277,7 +267,6 @@
     aria-describedby="textoAgua"
   >
     <div class="modal">
-
       <div class="modal-emoji">💧🥤</div>
 
       <h2 id="tituloAgua">
@@ -305,7 +294,6 @@
       >
         Fechar
       </button>
-
     </div>
   </div>
 
@@ -321,40 +309,50 @@
 
     let execucoes = 0;
 
-    // Abre o lembrete de hidratação
+    // Abre o lembrete
     function abrirLembreteAgua() {
       modalAgua.classList.add('visivel');
       bebiAgua.focus();
     }
 
-    // Fecha o lembrete de hidratação
+    // Fecha o lembrete
     function fecharLembreteAgua() {
       modalAgua.classList.remove('visivel');
       botao.focus();
     }
 
-    // Simula uma nova publicação
+    // Simula uma publicação
     botao.addEventListener('click', () => {
-      execucoes += 1;
+      execucoes++;
 
       contador.textContent = execucoes;
-
       commit.textContent =
         `demo-${String(execucoes).padStart(2, '0')}`;
 
       status.textContent =
         '✅ Verificação aprovada. Publicação concluída!';
 
-      // Após o sucesso, mostra o lembrete
       abrirLembreteAgua();
     });
 
-    // Cria a chuva quando o usuário confirma que bebeu água
+    // Cria chuva de gotas de água
     function iniciarChuva() {
-      const quantidadeGotas = 70;
+      // Evita criar várias camadas de chuva
+      let camada = document.getElementById('chuva-agua');
+
+      if (camada) {
+        camada.remove();
+      }
+
+      camada = document.createElement('div');
+      camada.id = 'chuva-agua';
+
+      document.body.appendChild(camada);
+
+      const quantidadeGotas = 120;
 
       for (let i = 0; i < quantidadeGotas; i++) {
-        const gota = document.createElement('div');
+        const gota = document.createElement('span');
 
         gota.className = 'gota-chuva';
         gota.textContent = '💧';
@@ -362,50 +360,58 @@
         // Posição horizontal aleatória
         gota.style.left = Math.random() * 100 + 'vw';
 
-        // Velocidade variada
-        gota.style.animationDuration =
-          (1.5 + Math.random() * 2.5) + 's';
+        // Tamanho variável
+        gota.style.fontSize =
+          (18 + Math.random() * 20) + 'px';
 
-        // Faz as gotas começarem em momentos diferentes
+        // Velocidade variável
+        gota.style.animationDuration =
+          (1.5 + Math.random() * 2) + 's';
+
+        // Início distribuído para parecer chuva
         gota.style.animationDelay =
           (Math.random() * 1.5) + 's';
 
-        // Tamanhos variados
-        gota.style.fontSize =
-          (14 + Math.random() * 20) + 'px';
+        camada.appendChild(gota);
 
-        document.body.appendChild(gota);
-
-        // Remove a gota depois da animação
+        // Remove a gota quando terminar de cair
         gota.addEventListener('animationend', () => {
           gota.remove();
+
+          // Remove a camada quando não houver mais gotas
+          if (
+            camada.isConnected &&
+            camada.childElementCount === 0
+          ) {
+            camada.remove();
+          }
         }, { once: true });
       }
     }
 
-    // Botão "Já bebi água!"
+    // Ao confirmar que bebeu água, começa a chuva
     bebiAgua.addEventListener('click', () => {
       fecharLembreteAgua();
 
       status.textContent =
-        '💧 Ótimo! Continue cuidando de você. Está chovendo água!';
+        '💧 Hidratação concluída! Está chovendo água!';
 
       iniciarChuva();
     });
 
-    // Botão para fechar o pop-up sem iniciar a chuva
+    // Fecha o pop-up sem iniciar a chuva
     fecharModal.addEventListener('click', () => {
       fecharLembreteAgua();
     });
 
-    // Fecha o pop-up ao clicar fora da caixa
+    // Fecha clicando fora da caixa
     modalAgua.addEventListener('click', (evento) => {
       if (evento.target === modalAgua) {
         fecharLembreteAgua();
       }
     });
 
-    // Fecha o pop-up com a tecla Escape
+    // Fecha usando a tecla Escape
     document.addEventListener('keydown', (evento) => {
       if (
         evento.key === 'Escape' &&
